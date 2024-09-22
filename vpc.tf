@@ -1,3 +1,4 @@
+### 1.vpc creation
 resource "aws_vpc" "main" {
   cidr_block       = var.vpc_cidr
   instance_tenancy = "default"
@@ -11,7 +12,7 @@ resource "aws_vpc" "main" {
     }
   )
 }
-
+### 2.internet gateway creation and attach to vpc
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
@@ -23,6 +24,8 @@ resource "aws_internet_gateway" "gw" {
     }
   )
 }
+
+### 3. Create subnets Public/private/database
 
 ## Public Subnet
 resource "aws_subnet" "public" { # first name is public[0], second name is public[1]
@@ -73,7 +76,7 @@ resource "aws_subnet" "database" { # first name is public[0], second name is pub
   )
 }
 
-
+### database subnet group
 resource "aws_db_subnet_group" "default" {
   name       = "${local.resource_name}"
   subnet_ids = aws_subnet.database[*].id
@@ -86,11 +89,11 @@ resource "aws_db_subnet_group" "default" {
     }
   )
 }
-
+### 4. Elastic IP
 resource "aws_eip" "nat" {
   domain   = "vpc"
 }
-
+### 5. Nat Gateway creation and allocation to public subnet
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public[0].id
@@ -102,13 +105,12 @@ resource "aws_nat_gateway" "nat" {
         Name = "${local.resource_name}" #expense-dev
     }
   )
-
   # To ensure proper ordering, it is recommended to add an explicit dependency
   # on the Internet Gateway for the VPC.
   depends_on = [aws_internet_gateway.gw] # this is explicit dependency
 }
 
-#### Public Route table ####
+#### 6.Public Route table ####
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -121,7 +123,7 @@ resource "aws_route_table" "public" {
   )
 }
 
-#### Private Route table ####
+#### 7.Private Route table ####
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
 
@@ -134,7 +136,7 @@ resource "aws_route_table" "private" {
   )
 }
 
-#### Database Route table ####
+#### 8.Database Route table ####
 resource "aws_route_table" "database" {
   vpc_id = aws_vpc.main.id
 
@@ -148,7 +150,7 @@ resource "aws_route_table" "database" {
 }
 
 
-#### Routes ####
+#### 9.Routes ####
 resource "aws_route" "public_route" {
   route_table_id            = aws_route_table.public.id
   destination_cidr_block    = "0.0.0.0/0"
@@ -167,7 +169,7 @@ resource "aws_route" "database_route_nat" {
   nat_gateway_id = aws_nat_gateway.nat.id
 }
 
-#### Route table and subnet associations ####
+#### 10.Route table and subnet associations ####
 resource "aws_route_table_association" "public" {
   count = length(var.public_subnet_cidrs)
   subnet_id      = element(aws_subnet.public[*].id, count.index)

@@ -2,15 +2,16 @@
 
 ![alt text](images/vpc.jpg)
 
-This module is developed for joindevops.com. We are creating following resources. This module creates resources in first 2 AZ for HA.
+This module is developed for joindevops.com. We are creating following resources. This module creates resources in first 2 Availablezone for HighAvailabilityzone.
 
+we created
 * VPC
 * Internet Gateway
-* Internet and VPC attachment
+* Internet gateway and VPC attachment
 * 2 Public Subnets.
 * 2 Private Subnes
 * 2 Database Subnets
-* EIP
+* Elastic IP
 * NAT Gateway
 * Public Route table
 * Private Route table
@@ -19,7 +20,7 @@ This module is developed for joindevops.com. We are creating following resources
 * Routes in all tables
 * Peering if required for user
 * Routes of peering in requestor and acceptor VPC.
-* Database sunet group
+* Database subnet group
 
 ### Inputs
 * project_name (Required): User should mention their project name. Type is string.

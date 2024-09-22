@@ -22,13 +22,13 @@ variable "enable_dns_hostnames" {
     type = bool
     default = true
 }
-
+ #optional
 variable "vpc_tags" {
     type = map
-    default = {}
+    default = {}   
 }
 
-#### IGW ####
+#### IGW ####  #optional
 variable "igw_tags"{
     type = map
     default = {}
